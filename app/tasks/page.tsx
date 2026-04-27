@@ -5,6 +5,8 @@ import { createClient } from "@/utils/supabase/server";
 import { ArrowRight, ClipboardList, MapPinned, Sparkles, Truck } from "lucide-react";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 export default async function TasksPage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

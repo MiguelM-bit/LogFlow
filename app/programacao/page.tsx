@@ -9,6 +9,8 @@ import type { ServiceResult } from "@/services/types";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 const REQUEST_TIMEOUT_MS = 7000;
 
 function normalizeError(error: unknown, label: string) {

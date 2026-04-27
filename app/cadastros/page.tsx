@@ -5,6 +5,8 @@ import { listEmpresasForOwnerSelect } from "@/services/veiculos";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 interface CadastrosPageProps {
   searchParams?: Promise<{ modulo?: string }>;
 }

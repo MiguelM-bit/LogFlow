@@ -6,6 +6,8 @@ import { getPublicEnv } from "@/config/env";
 import { Activity, Bell, Database, ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 export default async function SettingsPage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

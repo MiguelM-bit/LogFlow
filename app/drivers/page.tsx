@@ -5,6 +5,8 @@ import { createClient } from "@/utils/supabase/server";
 import { BarChart3, Gauge, Route, Truck, Users } from "lucide-react";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 export default async function DriversPage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

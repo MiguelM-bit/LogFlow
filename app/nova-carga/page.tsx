@@ -6,6 +6,8 @@ import { mapDatabaseLoad, summarizeLoads, formatCurrency } from "@/lib/cargas";
 import { DatabaseLoad } from "@/types";
 import { TrendingUp, Package, DollarSign, Sparkles } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function NovaCargarPage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

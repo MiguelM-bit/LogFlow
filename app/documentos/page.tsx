@@ -9,6 +9,8 @@ import {
   listDocuments,
 } from "@/services/documentService";
 
+export const dynamic = "force-dynamic";
+
 export default async function DocumentosPage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

@@ -9,6 +9,8 @@ import { createClient } from "@/utils/supabase/server";
 import { ComposicaoFull } from "@/types";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 export default async function ComposicoesPage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

@@ -6,6 +6,8 @@ import {
 } from "@/services/documentService";
 import { createClient } from "@/utils/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function MotoristaDocumentosPage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

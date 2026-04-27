@@ -4,8 +4,6 @@ import type { SignInPayload, AuthSession, UserProfile } from "@/types/user.types
 import { normalizeDocument } from "./validators";
 import { getPublicEnv } from "@/config/env";
 
-const env = getPublicEnv();
-
 /**
  * Sign in user with CPF and password
  * Uses CPF as email identifier in Supabase Auth
@@ -141,6 +139,7 @@ export async function resetPassword(
   cpf: string
 ): Promise<ServiceResult<null>> {
   const normalizedCpf = normalizeDocument(cpf);
+  const env = getPublicEnv();
 
   try {
     const email = `${normalizedCpf}@logflow.local`;
@@ -217,6 +216,7 @@ export async function createAuthUser(
   personId: string
 ): Promise<ServiceResult<{ userId: string; email: string } | null>> {
   const normalizedCpf = normalizeDocument(cpf);
+  const env = getPublicEnv();
 
   try {
     // Create user with CPF as email

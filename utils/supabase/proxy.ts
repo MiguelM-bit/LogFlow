@@ -2,9 +2,9 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import { getPublicEnv } from "@/config/env";
 
-const env = getPublicEnv();
-
 export const updateSession = async (request: NextRequest) => {
+  const env = getPublicEnv();
+
   let supabaseResponse = NextResponse.next({
     request: {
       headers: request.headers,

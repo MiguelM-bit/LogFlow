@@ -9,6 +9,8 @@ import { createClient } from "@/utils/supabase/server";
 import { Activity, CircleDollarSign, PackageCheck, TimerReset } from "lucide-react";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
