@@ -43,10 +43,13 @@ Crie `.env.local` com base em `.env.example`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+Obs: configure `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` **ou** `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
 Observacoes de seguranca:
 
@@ -73,12 +76,17 @@ npm run lint
 
 ## Configuracao de Ambiente Centralizada
 
-Arquivo: `config/env.ts`
+Arquivos:
+
+- `config/env.public.ts` (uso client/server para vars `NEXT_PUBLIC_*`, com fallback seguro e sem throw)
+- `config/env.server.ts` (uso server-only com validacao obrigatoria e fail fast)
+- `config/env.shared.ts` (tipos e helpers compartilhados)
 
 Responsabilidades:
 
 - Centralizar leitura de envs
-- Validar envs obrigatorias com erro claro
+- Evitar crash no client quando faltar variavel publica
+- Validar envs obrigatorias no server com erro claro
 - Separar uso publico (`NEXT_PUBLIC_*`) e servidor (`SUPABASE_SERVICE_ROLE_KEY`)
 
 Arquivo admin server-only: `utils/supabase/admin.ts`
@@ -112,6 +120,7 @@ Checklist rapido:
 Em Project Settings -> Environment Variables, adicionar:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (recomendado)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_APP_URL` (URL publica do projeto)

@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { formatCurrency, mapDatabaseLoad, summarizeLoads } from "@/lib/cargas";
 import { DatabaseLoad } from "@/types";
 import { createClient } from "@/utils/supabase/server";
-import { getPublicEnv } from "@/config/env";
+import { publicEnv } from "@/config/env.public";
 import { Activity, Bell, Database, ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 
@@ -11,7 +11,6 @@ export const dynamic = "force-dynamic";
 export default async function SettingsPage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  const env = getPublicEnv();
   const { data } = await supabase.from("cargas").select("*").order("updated_at", { ascending: false });
   const loads = (data ?? []).map((row) => mapDatabaseLoad(row as DatabaseLoad));
   const summary = summarizeLoads(loads);
@@ -31,7 +30,7 @@ export default async function SettingsPage() {
     },
     {
       title: "Seguranca",
-      description: `Credenciais publicas carregadas: ${env.NEXT_PUBLIC_SUPABASE_URL ? "sim" : "nao"}.`,
+      description: `Credenciais publicas carregadas: ${publicEnv.NEXT_PUBLIC_SUPABASE_URL ? "sim" : "nao"}.`,
       icon: ShieldCheck,
       tone: "from-emerald-500 to-teal-500",
     },

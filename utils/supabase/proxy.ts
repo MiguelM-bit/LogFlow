@@ -1,17 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-import { getPublicEnv } from "@/config/env";
+import { publicEnv } from "@/config/env.public";
 
 export const updateSession = async (request: NextRequest) => {
-  const env = getPublicEnv();
-
   let supabaseResponse = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  const supabase = createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_KEY, {
+  const supabase = createServerClient(publicEnv.NEXT_PUBLIC_SUPABASE_URL, publicEnv.NEXT_PUBLIC_SUPABASE_KEY, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

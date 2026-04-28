@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ServiceResult } from "./types";
 import type { SignInPayload, AuthSession, UserProfile } from "@/types/user.types";
 import { normalizeDocument } from "./validators";
-import { getPublicEnv } from "@/config/env";
+import { publicEnv } from "@/config/env.public";
 
 /**
  * Sign in user with CPF and password
@@ -139,13 +139,12 @@ export async function resetPassword(
   cpf: string
 ): Promise<ServiceResult<null>> {
   const normalizedCpf = normalizeDocument(cpf);
-  const env = getPublicEnv();
 
   try {
     const email = `${normalizedCpf}@logflow.local`;
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/motorista/reset-password`,
+      redirectTo: `${publicEnv.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/motorista/reset-password`,
     });
 
     if (error) {
@@ -216,7 +215,6 @@ export async function createAuthUser(
   personId: string
 ): Promise<ServiceResult<{ userId: string; email: string } | null>> {
   const normalizedCpf = normalizeDocument(cpf);
-  const env = getPublicEnv();
 
   try {
     // Create user with CPF as email
@@ -230,7 +228,7 @@ export async function createAuthUser(
           cpf: normalizedCpf,
           name: name,
         },
-        emailRedirectTo: `${env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/motorista/verify-email`,
+        emailRedirectTo: `${publicEnv.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/motorista/verify-email`,
       },
     });
 

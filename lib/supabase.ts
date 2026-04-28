@@ -1,11 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getPublicEnv } from "@/config/env";
+import { publicEnv } from "@/config/env.public";
 
 function createSupabaseClient() {
-  const env = getPublicEnv();
-
-  return createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_KEY);
+  return createClient(publicEnv.NEXT_PUBLIC_SUPABASE_URL, publicEnv.NEXT_PUBLIC_SUPABASE_KEY);
 }
 
 let supabaseInstance: SupabaseClient | null = null;
