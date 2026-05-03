@@ -1,51 +1,41 @@
+import Link from "next/link";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { StatCard } from "@/components/data-display/StatCard";
 import { PageContainer } from "@/components/layout/PageContainer";
-import { KanbanBoard } from "@/components/KanbanBoard";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency, mapDatabaseLoad, summarizeLoads } from "@/lib/cargas";
-import { DatabaseLoad } from "@/types";
-import { createClient } from "@/utils/supabase/server";
-import { Activity, CircleDollarSign, PackageCheck, TimerReset } from "lucide-react";
-import { cookies } from "next/headers";
+import { Card } from "@/components/ui/card";
+import { Activity, Layers2, Route, Truck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data } = await supabase.from("cargas").select("*").order("updated_at", { ascending: false });
-  const loads = (data ?? []).map((row) => mapDatabaseLoad(row as DatabaseLoad));
-  const summary = summarizeLoads(loads);
-
   const highlightCards = [
     {
-      label: "Cargas ativas",
-      value: summary.availableCount + summary.negotiatingCount + summary.scheduledCount,
+      label: "Módulos operacionais",
+      value: 6,
       icon: Activity,
       tone: "default" as const,
-      hint: "Disponivel + negociando + programada",
+      hint: "Fluxos críticos conectados",
     },
     {
-      label: "Frete total",
-      value: formatCurrency(summary.totalFreight),
-      icon: CircleDollarSign,
+      label: "Programação",
+      value: "SLA Ativo",
+      icon: Route,
       tone: "success" as const,
-      hint: "Volume financeiro da operação",
+      hint: "Motor de prioridade em execução",
     },
     {
-      label: "Concluidas",
-      value: summary.completedCount,
-      icon: PackageCheck,
+      label: "Composições",
+      value: "Em tempo real",
+      icon: Layers2,
       tone: "warning" as const,
-      hint: "Cargas encerradas no ciclo",
+      hint: "Vínculos monitorados continuamente",
     },
     {
-      label: "Ticket medio",
-      value: formatCurrency(summary.averageFreight),
-      icon: TimerReset,
+      label: "Cargas",
+      value: "Módulo dedicado",
+      icon: Truck,
       tone: "danger" as const,
-      hint: "Frete medio por carga",
+      hint: "CRUD independente em /cargas",
     },
   ];
 
@@ -65,32 +55,52 @@ export default async function Page() {
           ))}
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Card className="p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Disponivel</p>
-            <p className="mt-2 text-3xl font-semibold text-primary-600">{summary.availableCount}</p>
+        <section className="grid gap-4 lg:grid-cols-3">
+          <Card className="p-5">
+            <div className="flex items-start gap-3">
+              <Layers2 className="mt-1 h-5 w-5 text-primary-600" />
+              <div>
+                <h2 className="text-base font-semibold text-slate-900">Cargas como subsistema</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  O fluxo operacional de cargas foi separado do dashboard para evoluir com arquitetura limpa.
+                </p>
+                <Link href="/cargas" className="mt-3 inline-flex text-sm font-semibold text-primary-600 hover:text-primary-700">
+                  Abrir módulo de cargas
+                </Link>
+              </div>
+            </div>
           </Card>
-          <Card className="p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Negociando</p>
-            <p className="mt-2 text-3xl font-semibold text-amber-500">{summary.negotiatingCount}</p>
+
+          <Card className="p-5">
+            <div className="flex items-start gap-3">
+              <Route className="mt-1 h-5 w-5 text-amber-500" />
+              <div>
+                <h2 className="text-base font-semibold text-slate-900">Programação contínua</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Priorização SLA, sugestão de composição e visão em tempo real continuam disponíveis em Programação.
+                </p>
+                <Link href="/programacao" className="mt-3 inline-flex text-sm font-semibold text-amber-600 hover:text-amber-700">
+                  Ir para programação
+                </Link>
+              </div>
+            </div>
           </Card>
-          <Card className="p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Programada</p>
-            <p className="mt-2 text-3xl font-semibold text-indigo-500">{summary.scheduledCount}</p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Concluida</p>
-            <p className="mt-2 text-3xl font-semibold text-emerald-500">{summary.completedCount}</p>
+
+          <Card className="p-5">
+            <div className="flex items-start gap-3">
+              <Truck className="mt-1 h-5 w-5 text-emerald-600" />
+              <div>
+                <h2 className="text-base font-semibold text-slate-900">Composições e frota</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Gestão de ativos, engates e disponibilidade de operação seguem em módulos especializados.
+                </p>
+                <Link href="/composicoes" className="mt-3 inline-flex text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                  Gerenciar composições
+                </Link>
+              </div>
+            </div>
           </Card>
         </section>
-
-        <Card className="p-4 sm:p-6">
-          <CardHeader className="mb-5 p-0">
-            <CardTitle className="text-base">Pipeline operacional</CardTitle>
-            <CardDescription>Visão dinâmica das cargas por estágio da jornada.</CardDescription>
-          </CardHeader>
-          <KanbanBoard initialLoads={loads} />
-        </Card>
       </PageContainer>
     </DashboardLayout>
   );

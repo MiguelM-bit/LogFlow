@@ -13,7 +13,6 @@ import {
   Menu,
   X,
   Search,
-  ClipboardPlus,
   FileCheck2,
 } from "lucide-react";
 import { Link2 } from "lucide-react";
@@ -23,8 +22,7 @@ const navigationItems = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Programacao", href: "/programacao", icon: CalendarClock },
   { label: "Composicoes", href: "/composicoes", icon: Link2 },
-  { label: "Cargas", href: "/tasks", icon: Package },
-  { label: "Nova carga", href: "/nova-carga", icon: ClipboardPlus },
+  { label: "Cargas", href: "/cargas", icon: Package },
   { label: "Documentos", href: "/documentos", icon: FileCheck2 },
   { label: "Cadastros", href: "/cadastros", icon: Users },
   { label: "Frota", href: "/veiculos", icon: Truck },
