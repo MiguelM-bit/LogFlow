@@ -17,7 +17,7 @@ export async function listLoads(
 ): Promise<ServiceResult<LoadRecord[]>> {
   let query = supabase
     .from(LOADS_TABLE)
-    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id")
+    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id, vehicle_id")
     .order("updated_at", { ascending: false });
 
   if (filters.status) {
@@ -52,7 +52,7 @@ export async function createLoad(
   const { data, error } = await supabase
     .from(LOADS_TABLE)
     .insert(payload)
-    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id")
+    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id, vehicle_id")
     .single();
 
   if (error) {
@@ -76,12 +76,13 @@ export async function updateLoad(
   if (input.price !== undefined) payload.price = input.price;
   if (input.status !== undefined) payload.status = input.status;
   if (input.driverId !== undefined) payload.driver_id = input.driverId;
+  if (input.vehicleId !== undefined) payload.vehicle_id = input.vehicleId;
 
   const { data, error } = await supabase
     .from(LOADS_TABLE)
     .update(payload)
     .eq("id", loadId)
-    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id")
+    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id, vehicle_id")
     .single();
 
   if (error) {
@@ -95,10 +96,11 @@ export async function updateLoadStatus(
   supabase: SupabaseClient,
   loadId: string,
   nextStatus: LoadStatus,
-  driverId?: string | null
+  assignment?: { driverId?: string | null; vehicleId?: string | null }
 ): Promise<ServiceResult<LoadRecord | null>> {
   return await updateLoad(supabase, loadId, {
     status: nextStatus,
-    ...(driverId !== undefined ? { driverId } : {}),
+    ...(assignment?.driverId !== undefined ? { driverId: assignment.driverId } : {}),
+    ...(assignment?.vehicleId !== undefined ? { vehicleId: assignment.vehicleId } : {}),
   });
 }

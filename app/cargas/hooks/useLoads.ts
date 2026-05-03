@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
+  CloseLoadAssignmentInput,
   CreateLoadDTO,
-  DriverPreRegistrationInput,
   ListLoadsFilters,
   LoadRecord,
   LoadStatus,
@@ -17,6 +17,7 @@ import {
   updateLoadStatus,
 } from "@/app/cargas/services/loadService";
 import { createOrGetPreRegisteredDriver } from "@/app/cargas/services/driverPreRegistrationService";
+import { createOrGetVehicleByPlate } from "@/app/cargas/services/closeLoadService";
 
 interface UseLoadsResult {
   loads: LoadRecord[];
@@ -33,7 +34,7 @@ interface UseLoadsResult {
   changeStatus: (
     loadId: string,
     nextStatus: LoadStatus,
-    preRegistration?: DriverPreRegistrationInput
+    closeAssignment?: CloseLoadAssignmentInput
   ) => Promise<boolean>;
 }
 
@@ -106,7 +107,7 @@ export function useLoads(initialLoads: LoadRecord[]): UseLoadsResult {
     async (
       loadId: string,
       nextStatus: LoadStatus,
-      preRegistration?: DriverPreRegistrationInput
+      closeAssignment?: CloseLoadAssignmentInput
     ): Promise<boolean> => {
       const previous = loads;
 
@@ -119,20 +120,46 @@ export function useLoads(initialLoads: LoadRecord[]): UseLoadsResult {
         )
       );
 
-      let driverId: string | undefined;
+      let driverId: string | undefined = closeAssignment?.driverId;
+      let vehicleId: string | undefined = closeAssignment?.vehicleId;
 
-      if (nextStatus === "fechada" && preRegistration) {
-        const pre = await createOrGetPreRegisteredDriver(supabase, preRegistration);
-        if (pre.error || !pre.data) {
+      if (nextStatus === "fechada") {
+        if (!driverId && closeAssignment?.preDriver) {
+          const preDriverResult = await createOrGetPreRegisteredDriver(supabase, closeAssignment.preDriver);
+          if (preDriverResult.error || !preDriverResult.data) {
+            setLoadingStatusId(null);
+            setLoads(previous);
+            setError(preDriverResult.error ?? "Não foi possível criar o pré-cadastro de motorista.");
+            return false;
+          }
+          driverId = preDriverResult.data.id;
+        }
+
+        if (!vehicleId && closeAssignment?.preVehicle) {
+          const preVehicleResult = await createOrGetVehicleByPlate(supabase, closeAssignment.preVehicle);
+          if (preVehicleResult.error || !preVehicleResult.data) {
+            setLoadingStatusId(null);
+            setLoads(previous);
+            setError(preVehicleResult.error ?? "Não foi possível criar o pré-cadastro de veículo.");
+            return false;
+          }
+          vehicleId = preVehicleResult.data.id;
+        }
+
+        if (!driverId || !vehicleId) {
           setLoadingStatusId(null);
           setLoads(previous);
-          setError(pre.error ?? "Não foi possível criar o pré-cadastro de motorista.");
+          setError("Para fechar a carga, informe motorista e veículo.");
           return false;
         }
-        driverId = pre.data.id;
       }
 
-      const result = await updateLoadStatus(supabase, loadId, nextStatus, driverId);
+      const result = await updateLoadStatus(
+        supabase,
+        loadId,
+        nextStatus,
+        nextStatus === "fechada" ? { driverId, vehicleId } : undefined
+      );
       setLoadingStatusId(null);
 
       if (result.error) {

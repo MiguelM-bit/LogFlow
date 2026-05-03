@@ -2,13 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Search } from "lucide-react";
-import type { DriverPreRegistrationInput, LoadRecord, LoadStatus } from "@/app/cargas/types/contracts";
+import type { CloseLoadAssignmentInput, LoadRecord, LoadStatus } from "@/app/cargas/types/contracts";
 import { useLoads } from "@/app/cargas/hooks/useLoads";
 import { useDebouncedValue } from "@/app/cargas/utils/filters";
 import { CargasTabs } from "@/app/cargas/components/CargasTabs";
 import { CargasTable } from "@/app/cargas/components/CargasTable";
 import { LoadFormDialog } from "@/app/cargas/components/LoadFormDialog";
-import { DriverPreRegistrationDialog } from "@/app/cargas/components/DriverPreRegistrationDialog";
+import { CloseLoadAssignmentDialog } from "@/app/cargas/components/CloseLoadAssignmentDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -91,7 +91,7 @@ export function CargasPageClient({ initialLoads }: CargasPageClientProps) {
       return;
     }
 
-    if (nextStatus === "fechada" && !load.driverId) {
+    if (nextStatus === "fechada") {
       setPendingStatus({ loadId: load.id, status: nextStatus });
       return;
     }
@@ -99,7 +99,7 @@ export function CargasPageClient({ initialLoads }: CargasPageClientProps) {
     await changeStatus(load.id, nextStatus);
   }
 
-  async function handleConfirmPreRegistration(payload: DriverPreRegistrationInput) {
+  async function handleConfirmCloseAssignment(payload: CloseLoadAssignmentInput) {
     if (!pendingStatus) {
       return;
     }
@@ -192,11 +192,11 @@ export function CargasPageClient({ initialLoads }: CargasPageClientProps) {
         onSubmit={handleCreateOrUpdate}
       />
 
-      <DriverPreRegistrationDialog
+      <CloseLoadAssignmentDialog
         open={Boolean(pendingStatus)}
         loading={Boolean(loadingStatusId)}
         onClose={() => setPendingStatus(null)}
-        onConfirm={handleConfirmPreRegistration}
+        onConfirm={handleConfirmCloseAssignment}
       />
     </div>
   );

@@ -10,6 +10,7 @@ interface LoadRow {
   updated_at: string;
   created_by: string | null;
   driver_id: string | null;
+  vehicle_id: string | null;
 }
 
 export function mapLoadRow(row: LoadRow): LoadRecord {
@@ -23,6 +24,7 @@ export function mapLoadRow(row: LoadRow): LoadRecord {
     updatedAt: row.updated_at,
     createdBy: row.created_by,
     driverId: row.driver_id,
+    vehicleId: row.vehicle_id,
   };
 }
 
