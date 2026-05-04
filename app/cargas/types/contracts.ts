@@ -3,8 +3,12 @@ export type LoadStatus = "em_aberto" | "em_negociacao" | "fechada" | "cancelada"
 export interface LoadRecord {
   id: string;
   status: LoadStatus;
+  cliente: string | null;
+  perfil: string | null;
   origin: string;
+  horarioColeta: string | null;
   destination: string;
+  horarioDescarga: string | null;
   price: number;
   createdAt: string;
   updatedAt: string;
@@ -18,6 +22,10 @@ export interface CreateLoadDTO {
   destination: string;
   price: number;
   status: LoadStatus;
+  cliente?: string | null;
+  perfil?: string | null;
+  horarioColeta?: string | null;
+  horarioDescarga?: string | null;
 }
 
 export interface UpdateLoadDTO {
@@ -25,6 +33,10 @@ export interface UpdateLoadDTO {
   destination?: string;
   price?: number;
   status?: LoadStatus;
+  cliente?: string | null;
+  perfil?: string | null;
+  horarioColeta?: string | null;
+  horarioDescarga?: string | null;
   driverId?: string | null;
   vehicleId?: string | null;
 }
@@ -32,6 +44,10 @@ export interface UpdateLoadDTO {
 export interface ListLoadsFilters {
   status?: LoadStatus;
   search?: string;
+  cliente?: string;
+  perfil?: string;
+  origin?: string;
+  destination?: string;
 }
 
 export interface DriverPreRegistrationInput {

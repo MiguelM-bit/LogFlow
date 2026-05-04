@@ -8,12 +8,20 @@ interface LoadFormState {
   destination: string;
   price: string;
   status: CreateLoadDTO["status"];
+  cliente: string;
+  perfil: string;
+  horarioColeta: string;
+  horarioDescarga: string;
 }
 
 export interface LoadFormValidation {
   origin?: string;
   destination?: string;
   price?: string;
+  cliente?: string;
+  perfil?: string;
+  horarioColeta?: string;
+  horarioDescarga?: string;
 }
 
 const INITIAL_FORM: LoadFormState = {
@@ -21,6 +29,10 @@ const INITIAL_FORM: LoadFormState = {
   destination: "",
   price: "",
   status: "em_aberto",
+  cliente: "",
+  perfil: "",
+  horarioColeta: "",
+  horarioDescarga: "",
 };
 
 function validate(form: LoadFormState): LoadFormValidation {
@@ -53,6 +65,10 @@ export function useLoadForm(initial?: LoadRecord | null) {
       destination: initial.destination,
       price: String(initial.price),
       status: initial.status,
+      cliente: initial.cliente ?? "",
+      perfil: initial.perfil ?? "",
+      horarioColeta: initial.horarioColeta ?? "",
+      horarioDescarga: initial.horarioDescarga ?? "",
     };
   });
   const [errors, setErrors] = useState<LoadFormValidation>({});
@@ -73,6 +89,10 @@ export function useLoadForm(initial?: LoadRecord | null) {
         destination: nextInitial.destination,
         price: String(nextInitial.price),
         status: nextInitial.status,
+        cliente: nextInitial.cliente ?? "",
+        perfil: nextInitial.perfil ?? "",
+        horarioColeta: nextInitial.horarioColeta ?? "",
+        horarioDescarga: nextInitial.horarioDescarga ?? "",
       });
       setErrors({});
       return;
@@ -95,6 +115,10 @@ export function useLoadForm(initial?: LoadRecord | null) {
       destination: form.destination.trim(),
       price: Number(form.price.replace(",", ".")),
       status: form.status,
+      cliente: form.cliente.trim() || null,
+      perfil: form.perfil.trim() || null,
+      horarioColeta: form.horarioColeta || null,
+      horarioDescarga: form.horarioDescarga || null,
     };
   }
 

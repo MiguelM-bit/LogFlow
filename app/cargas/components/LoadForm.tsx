@@ -20,6 +20,10 @@ interface LoadFormProps {
     destination: string;
     price: number;
     status: "em_aberto" | "em_negociacao" | "fechada" | "cancelada";
+    cliente?: string | null;
+    perfil?: string | null;
+    horarioColeta?: string | null;
+    horarioDescarga?: string | null;
   }) => Promise<boolean>;
   onCancel: () => void;
 }
@@ -45,6 +49,26 @@ export function LoadForm({ initialLoad, submitting, onSubmit, onCancel }: LoadFo
     <form className="space-y-4" onSubmit={handleSubmit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Cliente</label>
+          <Input
+            value={formApi.form.cliente}
+            onChange={(event) => formApi.patch("cliente", event.target.value)}
+            placeholder="Nome do cliente"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Perfil</label>
+          <Input
+            value={formApi.form.perfil}
+            onChange={(event) => formApi.patch("perfil", event.target.value)}
+            placeholder="Ex: Granel, Frigorífico..."
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
           <label className="text-sm font-medium text-slate-700">Origem</label>
           <Input
             value={formApi.form.origin}
@@ -57,6 +81,17 @@ export function LoadForm({ initialLoad, submitting, onSubmit, onCancel }: LoadFo
         </div>
 
         <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Data/hora Coleta</label>
+          <Input
+            type="datetime-local"
+            value={formApi.form.horarioColeta}
+            onChange={(event) => formApi.patch("horarioColeta", event.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
           <label className="text-sm font-medium text-slate-700">Destino</label>
           <Input
             value={formApi.form.destination}
@@ -66,6 +101,15 @@ export function LoadForm({ initialLoad, submitting, onSubmit, onCancel }: LoadFo
           {formApi.errors.destination ? (
             <p className="text-xs text-rose-600">{formApi.errors.destination}</p>
           ) : null}
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700">Data/hora Descarga</label>
+          <Input
+            type="datetime-local"
+            value={formApi.form.horarioDescarga}
+            onChange={(event) => formApi.patch("horarioDescarga", event.target.value)}
+          />
         </div>
       </div>
 

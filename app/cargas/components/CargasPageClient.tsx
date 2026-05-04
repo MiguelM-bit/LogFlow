@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, Plus } from "lucide-react";
 import type { CloseLoadAssignmentInput, LoadRecord, LoadStatus } from "@/app/cargas/types/contracts";
 import { useLoads } from "@/app/cargas/hooks/useLoads";
 import { useDebouncedValue } from "@/app/cargas/utils/filters";
@@ -21,6 +21,13 @@ interface PendingStatusUpdate {
   status: LoadStatus;
 }
 
+interface FilterState {
+  cliente: string;
+  perfil: string;
+  origin: string;
+  destination: string;
+}
+
 function countByStatus(loads: LoadRecord[]) {
   return {
     em_aberto: loads.filter((load) => load.status === "em_aberto").length,
@@ -32,12 +39,24 @@ function countByStatus(loads: LoadRecord[]) {
 
 export function CargasPageClient({ initialLoads }: CargasPageClientProps) {
   const [activeTab, setActiveTab] = useState<LoadStatus>("em_aberto");
-  const [search, setSearch] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLoad, setEditingLoad] = useState<LoadRecord | null>(null);
   const [pendingStatus, setPendingStatus] = useState<PendingStatusUpdate | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterInputs, setFilterInputs] = useState<FilterState>({
+    cliente: "",
+    perfil: "",
+    origin: "",
+    destination: "",
+  });
 
-  const debouncedSearch = useDebouncedValue(search, 250);
+  const debouncedCliente = useDebouncedValue(filterInputs.cliente, 300);
+  const debouncedPerfil = useDebouncedValue(filterInputs.perfil, 300);
+  const debouncedOrigin = useDebouncedValue(filterInputs.origin, 300);
+  const debouncedDestination = useDebouncedValue(filterInputs.destination, 300);
+
+  const activeFilterCount = [filterInputs.cliente, filterInputs.perfil, filterInputs.origin, filterInputs.destination]
+    .filter(Boolean).length;
 
   const {
     loads,
@@ -54,8 +73,13 @@ export function CargasPageClient({ initialLoads }: CargasPageClientProps) {
   } = useLoads(initialLoads);
 
   useEffect(() => {
-    setFilters({ search: debouncedSearch });
-  }, [debouncedSearch, setFilters]);
+    setFilters({
+      cliente: debouncedCliente || undefined,
+      perfil: debouncedPerfil || undefined,
+      origin: debouncedOrigin || undefined,
+      destination: debouncedDestination || undefined,
+    });
+  }, [debouncedCliente, debouncedPerfil, debouncedOrigin, debouncedDestination, setFilters]);
 
   const counts = useMemo(() => countByStatus(loads), [loads]);
   const loadsByTab = useMemo(
@@ -68,6 +92,10 @@ export function CargasPageClient({ initialLoads }: CargasPageClientProps) {
     destination: string;
     price: number;
     status: LoadStatus;
+    cliente?: string | null;
+    perfil?: string | null;
+    horarioColeta?: string | null;
+    horarioDescarga?: string | null;
   }): Promise<boolean> {
     const ok = editingLoad
       ? await update(editingLoad.id, payload)
@@ -135,16 +163,63 @@ export function CargasPageClient({ initialLoads }: CargasPageClientProps) {
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CargasTabs active={activeTab} counts={counts} onChange={setActiveTab} />
 
-          <div className="relative w-full sm:w-[280px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              className="pl-9"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Filtrar por origem/destino"
-            />
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters((prev) => !prev)}
+            className="flex items-center gap-1.5"
+          >
+            <Filter className="h-3.5 w-3.5" />
+            Filtros
+            {activeFilterCount > 0 ? (
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-semibold text-white">
+                {activeFilterCount}
+              </span>
+            ) : null}
+            {showFilters ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+          </Button>
         </div>
+
+        {showFilters ? (
+          <div className="mt-3 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Cliente</label>
+              <Input
+                value={filterInputs.cliente}
+                onChange={(e) => setFilterInputs((prev) => ({ ...prev, cliente: e.target.value }))}
+                placeholder="Buscar por cliente"
+                className="h-8 text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Perfil</label>
+              <Input
+                value={filterInputs.perfil}
+                onChange={(e) => setFilterInputs((prev) => ({ ...prev, perfil: e.target.value }))}
+                placeholder="Buscar por perfil"
+                className="h-8 text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Origem</label>
+              <Input
+                value={filterInputs.origin}
+                onChange={(e) => setFilterInputs((prev) => ({ ...prev, origin: e.target.value }))}
+                placeholder="Buscar por origem"
+                className="h-8 text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Destino</label>
+              <Input
+                value={filterInputs.destination}
+                onChange={(e) => setFilterInputs((prev) => ({ ...prev, destination: e.target.value }))}
+                placeholder="Buscar por destino"
+                className="h-8 text-sm"
+              />
+            </div>
+          </div>
+        ) : null}
       </section>
 
       {success ? (

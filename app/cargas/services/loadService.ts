@@ -11,22 +11,41 @@ import type { ServiceResult } from "@/services/types";
 
 const LOADS_TABLE = "loads";
 
+const LOADS_COLUMNS = "id, status, cliente, perfil, origin, horario_coleta, destination, horario_descarga, price, created_at, updated_at, created_by, driver_id, vehicle_id";
+
 export async function listLoads(
   supabase: SupabaseClient,
   filters: ListLoadsFilters
 ): Promise<ServiceResult<LoadRecord[]>> {
   let query = supabase
     .from(LOADS_TABLE)
-    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id, vehicle_id")
-    .order("updated_at", { ascending: false });
+    .select(LOADS_COLUMNS)
+    .order("horario_coleta", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: false });
 
   if (filters.status) {
     query = query.eq("status", filters.status);
   }
 
+  if (filters.cliente?.trim()) {
+    query = query.ilike("cliente", `%${filters.cliente.trim()}%`);
+  }
+
+  if (filters.perfil?.trim()) {
+    query = query.ilike("perfil", `%${filters.perfil.trim()}%`);
+  }
+
+  if (filters.origin?.trim()) {
+    query = query.ilike("origin", `%${filters.origin.trim()}%`);
+  }
+
+  if (filters.destination?.trim()) {
+    query = query.ilike("destination", `%${filters.destination.trim()}%`);
+  }
+
   if (filters.search?.trim()) {
     const escaped = filters.search.trim().replace(/,/g, " ");
-    query = query.or(`origin.ilike.%${escaped}%,destination.ilike.%${escaped}%`);
+    query = query.or(`origin.ilike.%${escaped}%,destination.ilike.%${escaped}%,cliente.ilike.%${escaped}%`);
   }
 
   const { data, error } = await query;
@@ -47,12 +66,16 @@ export async function createLoad(
     origin: input.origin.trim(),
     destination: input.destination.trim(),
     price: input.price,
+    cliente: input.cliente?.trim() ?? null,
+    perfil: input.perfil?.trim() ?? null,
+    horario_coleta: input.horarioColeta ?? null,
+    horario_descarga: input.horarioDescarga ?? null,
   };
 
   const { data, error } = await supabase
     .from(LOADS_TABLE)
     .insert(payload)
-    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id, vehicle_id")
+    .select(LOADS_COLUMNS)
     .single();
 
   if (error) {
@@ -75,6 +98,10 @@ export async function updateLoad(
   if (input.destination !== undefined) payload.destination = input.destination.trim();
   if (input.price !== undefined) payload.price = input.price;
   if (input.status !== undefined) payload.status = input.status;
+  if (input.cliente !== undefined) payload.cliente = input.cliente?.trim() ?? null;
+  if (input.perfil !== undefined) payload.perfil = input.perfil?.trim() ?? null;
+  if (input.horarioColeta !== undefined) payload.horario_coleta = input.horarioColeta;
+  if (input.horarioDescarga !== undefined) payload.horario_descarga = input.horarioDescarga;
   if (input.driverId !== undefined) payload.driver_id = input.driverId;
   if (input.vehicleId !== undefined) payload.vehicle_id = input.vehicleId;
 
@@ -82,7 +109,7 @@ export async function updateLoad(
     .from(LOADS_TABLE)
     .update(payload)
     .eq("id", loadId)
-    .select("id, status, origin, destination, price, created_at, updated_at, created_by, driver_id, vehicle_id")
+    .select(LOADS_COLUMNS)
     .single();
 
   if (error) {

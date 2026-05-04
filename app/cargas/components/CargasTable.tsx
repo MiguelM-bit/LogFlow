@@ -1,5 +1,6 @@
 "use client";
 
+import { Clock } from "lucide-react";
 import type { LoadRecord, LoadStatus } from "@/app/cargas/types/contracts";
 import { LoadStatusBadge } from "@/app/cargas/components/LoadStatusBadge";
 import { Button } from "@/components/ui/button";
@@ -27,14 +28,8 @@ interface CargasTableProps {
   onStatusChange: (load: LoadRecord, status: LoadStatus) => void;
 }
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
-}
-
-function formatDate(value: string) {
+function formatDateTime(value: string | null) {
+  if (!value) return "—";
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -57,10 +52,12 @@ export function CargasTable({
         <TableHeader>
           <TableRow>
             <TableHead>Status</TableHead>
+            <TableHead>Cliente</TableHead>
+            <TableHead>Perfil</TableHead>
             <TableHead>Origem</TableHead>
+            <TableHead>Data/hora Coleta</TableHead>
             <TableHead>Destino</TableHead>
-            <TableHead>Frete</TableHead>
-            <TableHead>Atualizada em</TableHead>
+            <TableHead>Data/hora Descarga</TableHead>
             <TableHead className="w-[220px]">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -70,10 +67,16 @@ export function CargasTable({
               <TableCell>
                 <LoadStatusBadge status={load.status} />
               </TableCell>
-              <TableCell className="font-medium">{load.origin}</TableCell>
+              <TableCell className="font-medium">{load.cliente ?? "—"}</TableCell>
+              <TableCell className="text-slate-600">{load.perfil ?? "—"}</TableCell>
+              <TableCell>{load.origin}</TableCell>
+              <TableCell className="whitespace-nowrap text-sm text-slate-600">
+                {formatDateTime(load.horarioColeta)}
+              </TableCell>
               <TableCell>{load.destination}</TableCell>
-              <TableCell>{formatCurrency(load.price)}</TableCell>
-              <TableCell className="whitespace-nowrap text-xs text-slate-500">{formatDate(load.updatedAt)}</TableCell>
+              <TableCell className="whitespace-nowrap text-sm text-slate-600">
+                {formatDateTime(load.horarioDescarga)}
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Select
@@ -99,6 +102,13 @@ export function CargasTable({
                   >
                     Editar
                   </Button>
+
+                  <div className="group relative flex items-center">
+                    <Clock className="h-3.5 w-3.5 cursor-default text-slate-400" />
+                    <div className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                      Atualizada em: {formatDateTime(load.updatedAt)}
+                    </div>
+                  </div>
                 </div>
               </TableCell>
             </TableRow>
